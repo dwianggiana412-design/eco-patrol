@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/auth_provider.dart';
 import 'register_screen.dart'; 
 
-// Widget LoginScreen: Layar untuk otentikasi pengguna.
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -15,10 +14,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   String? _errorMessage;
+  bool _isLoading = false;
 
-  // Handler Login: Memanggil fungsi login dari AuthNotifier.
   Future<void> _handleLogin() async {
     setState(() {
+      _isLoading = true;
       _errorMessage = null;
     });
     
@@ -30,6 +30,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     } catch (e) {
       setState(() {
         _errorMessage = e.toString().replaceFirst('Exception: ', '');
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
       });
     }
   }
@@ -43,38 +47,45 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'MAHASISWA 1: The Gatekeeper', 
+            const Text(
+              'LOGIN', 
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)
             ),
             const SizedBox(height: 30),
             TextField(
               controller: _usernameController,
               decoration: const InputDecoration(
-                labelText: 'Username (Coba: user)',
+                labelText: 'Username',
                 border: OutlineInputBorder(),
               ),
+              enabled: !_isLoading,
             ),
             const SizedBox(height: 12),
             TextField(
               controller: _passwordController,
               decoration: const InputDecoration(
-                labelText: 'Password (Coba: 123)',
+                labelText: 'Password',
                 border: OutlineInputBorder(),
               ),
               obscureText: true,
+              enabled: !_isLoading,
             ),
             const SizedBox(height: 20),
             if (_errorMessage != null)
               Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
             const SizedBox(height: 10),
             ElevatedButton(
-              onPressed: _handleLogin,
-              child: const Text('Login'),
+              onPressed: _isLoading ? null : _handleLogin,
+              child: _isLoading
+                 ? const SizedBox(
+                      width: 20, 
+                      height: 20, 
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)
+                   )
+                 : const Text('Login'),
             ),
-            // Tombol untuk navigasi ke Register
             TextButton(
-              onPressed: () {
+              onPressed: _isLoading ? null : () {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => const RegisterScreen()),
                 );

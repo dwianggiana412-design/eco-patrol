@@ -57,7 +57,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             TextField(
               controller: _usernameController,
               decoration: const InputDecoration(
-                labelText: 'Username (Min. 3 Karakter)',
+                labelText: 'Username',
                 border: OutlineInputBorder(),
               ),
             ),
@@ -65,7 +65,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             TextField(
               controller: _passwordController,
               decoration: const InputDecoration(
-                labelText: 'Password (Min. 6 Karakter)',
+                labelText: 'Password',
                 border: OutlineInputBorder(),
               ),
               obscureText: true,

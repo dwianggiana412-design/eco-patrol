@@ -39,12 +39,13 @@ class DBHelper {
     // Perintah SQL untuk membuat tabel 'reports' (menggunakan ReportModel.tableName)
     await db.execute('''
       CREATE TABLE ${ReportModel.tableName} (
-        id TEXT PRIMARY KEY,
-        description TEXT,
-        latitude REAL,
-        longitude REAL,
-        photoPath TEXT,
-        status TEXT
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT,
+      description TEXT,
+      imagePath TEXT,
+      latitude REAL,
+      longitude REAL,
+      status TEXT
       )
     ''');
     print("SQFlite: Tabel '${ReportModel.tableName}' berhasil dibuat.");

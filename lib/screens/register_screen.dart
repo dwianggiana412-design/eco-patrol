@@ -1,23 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/auth_provider.dart';
-import 'register_screen.dart'; 
 
-// Widget LoginScreen: Layar untuk otentikasi pengguna.
-class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
+// Widget RegisterScreen: Layar untuk pendaftaran pengguna baru.
+class RegisterScreen extends ConsumerStatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  ConsumerState<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends ConsumerState<LoginScreen> {
+class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   String? _errorMessage;
 
-  // Handler Login: Memanggil fungsi login dari AuthNotifier.
-  Future<void> _handleLogin() async {
+  // Handler Register: Memanggil fungsi register dari AuthNotifier.
+  Future<void> _handleRegister() async {
     setState(() {
       _errorMessage = null;
     });
@@ -26,7 +25,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final password = _passwordController.text;
 
     try {
-      await ref.read(authProvider.notifier).login(username, password);
+      await ref.read(authProvider.notifier).register(username, password);
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Registrasi Berhasil! Silakan Login.')),
+      );
+      
+      Navigator.of(context).pop();
+
     } catch (e) {
       setState(() {
         _errorMessage = e.toString().replaceFirst('Exception: ', '');
@@ -37,21 +43,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('EcoPatrol Login')),
+      appBar: AppBar(title: const Text('EcoPatrol Register')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'MAHASISWA 1: The Gatekeeper', 
+              'MAHASISWA 2: The Enroller', 
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)
             ),
             const SizedBox(height: 30),
             TextField(
               controller: _usernameController,
               decoration: const InputDecoration(
-                labelText: 'Username (Coba: user)',
+                labelText: 'Username (Min. 3 Karakter)',
                 border: OutlineInputBorder(),
               ),
             ),
@@ -59,7 +65,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             TextField(
               controller: _passwordController,
               decoration: const InputDecoration(
-                labelText: 'Password (Coba: 123)',
+                labelText: 'Password (Min. 6 Karakter)',
                 border: OutlineInputBorder(),
               ),
               obscureText: true,
@@ -69,17 +75,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
             const SizedBox(height: 10),
             ElevatedButton(
-              onPressed: _handleLogin,
-              child: const Text('Login'),
-            ),
-            // Tombol untuk navigasi ke Register
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const RegisterScreen()),
-                );
-              },
-              child: const Text('Belum punya akun? Daftar di sini!'),
+              onPressed: _handleRegister,
+              child: const Text('Register'),
             ),
           ],
         ),

@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../helpers/db_helper.dart';
 import '../models/report_model.dart';
 
+// akses utama untuk seluruh data laporan
 final reportProvider = NotifierProvider<ReportNotifier, List<ReportModel>>(() {
   return ReportNotifier();
 });

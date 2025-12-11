@@ -57,7 +57,7 @@ class ReportModel {
     };
   }
 
-  // Metode copyWith untuk mempermudah update data
+  // Metode copyWith untuk mempermudah mengupdate data
   ReportModel copyWith({
     int? id,
     String? status,

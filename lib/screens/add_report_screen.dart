@@ -20,7 +20,7 @@ class _AddReportScreenState extends ConsumerState<AddReportScreen> {
   double? lat;
   double? long;
 
-  // FUNGSI AMBIL FOTO
+  // mengambil poto dari kamera atau galeri 
   Future<void> pickImage(bool isCamera) async {
     final picker = ImagePicker();
     final XFile? result = await picker.pickImage(
@@ -36,11 +36,9 @@ class _AddReportScreenState extends ConsumerState<AddReportScreen> {
     }
   }
 
-  // ----------------------------
-  // FUNGSI AMBIL LOKASI GPS
-  // ----------------------------
+  // mengambil lokasi gps
   Future<void> getLocation() async {
-    // Minta izin akses lokasi
+    // meminta izin untuk akses lokasi
     LocationPermission permission = await Geolocator.requestPermission();
 
     if (permission == LocationPermission.denied ||
@@ -52,7 +50,7 @@ class _AddReportScreenState extends ConsumerState<AddReportScreen> {
       return;
     }
 
-    // Menggunakan LocationSettings untuk mengganti desiredAccuracy yang deprecated
+    // menggunakan LocationSettings untuk mengganti desiredAccuracy yang deprecated
     final LocationSettings locationSettings = LocationSettings(
       accuracy: LocationAccuracy.high,
       distanceFilter: 100, 
@@ -70,9 +68,8 @@ class _AddReportScreenState extends ConsumerState<AddReportScreen> {
     });
   }
 
-  // fungsi submit atau simpan laporan
+  // untuk submit atau simpan laporan
   Future<void> submitReport() async {
-    // Validasi semua input harus lengkap
     if (titleCtrl.text.isEmpty ||
         descCtrl.text.isEmpty ||
         imageFile == null ||
@@ -85,8 +82,7 @@ class _AddReportScreenState extends ConsumerState<AddReportScreen> {
       return;
     }
 
-    // Membuat object laporan
-    // Menggunakan imagePath, dan tidak menggunakan photoPath yang undefined
+    // membuat object laporan menggunakan image path
     final report = ReportModel(
       title: titleCtrl.text,
       description: descCtrl.text,
@@ -96,7 +92,6 @@ class _AddReportScreenState extends ConsumerState<AddReportScreen> {
     );
 
     try {
-      // Menggunakan reportsNotifierProvider.notifier yang benar
       await ref.read(reportProvider.notifier).addReport(report);
 
       if (!mounted) return;

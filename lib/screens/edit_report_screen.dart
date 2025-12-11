@@ -1,11 +1,9 @@
-// edit_report_screen.dart
-
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart'; 
 import '../models/report_model.dart'; 
 import '../providers/report_provider.dart';
-
-// import image_picker atau camera package
 
 class EditReportScreen extends ConsumerStatefulWidget {
   final ReportModel report;
@@ -17,49 +15,59 @@ class EditReportScreen extends ConsumerStatefulWidget {
 
 class _EditReportScreenState extends ConsumerState<EditReportScreen> {
   final _descController = TextEditingController();
-  String? _pickedImagePath; // Path untuk foto hasil pengerjaan
+  String? _pickedImagePath; 
+
+  @override
+  void initState() {
+    super.initState();
+    _descController.text = widget.report.officerDescription ?? '';
+    _pickedImagePath = widget.report.resultImagePath;
+  }
+
+  @override
+  void dispose() {
+    _descController.dispose();
+    super.dispose();
+  }
 
   Future<void> _pickImage() async {
-    // Implementasi ambil foto dari Kamera/Galeri (seperti Mhs 2)
-    // Asumsi: Path foto disimpan di _pickedImagePath
-    setState(() {
-      _pickedImagePath = 'assets/result_photo.jpg'; // Path mock
-    });
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.camera); 
+
+    if (pickedFile != null) {
+      setState(() {
+        _pickedImagePath = pickedFile.path;
+      });
+    }
   }
 
   void _submitUpdate() {
     if (_descController.text.isEmpty || _pickedImagePath == null) {
-      // Tampilkan error
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Mohon isi deskripsi dan ambil foto hasil pengerjaan.')),
       );
       return;
     }
 
-    // Buat model laporan baru dengan status 'Selesai'
     final updatedReport = widget.report.copyWith(
       status: 'Selesai',
       officerDescription: _descController.text,
       resultImagePath: _pickedImagePath,
     );
 
-    // Panggil logika update di Riverpod
     ref.read(reportProvider.notifier).updateReport(updatedReport);
 
-    // Kembali ke Detail atau Dashboard
-    Navigator.of(context).pop(); // Kembali dari Edit
-    Navigator.of(context).pop(); // Kembali dari Detail ke Dashboard
+    Navigator.of(context).pop(); 
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Tandai Selesai')),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // 1. Input Deskripsi Laporan Pekerjaan
             TextField(
               controller: _descController,
               decoration: const InputDecoration(
@@ -70,32 +78,46 @@ class _EditReportScreenState extends ConsumerState<EditReportScreen> {
             ),
             const SizedBox(height: 24),
 
-            // 2. Integrasi Kamera untuk Bukti Hasil
             ElevatedButton.icon(
               onPressed: _pickImage,
               icon: const Icon(Icons.camera_alt),
               label: const Text('Ambil Foto Hasil Pengerjaan'),
             ),
             
-            // Preview Foto
-            if (_pickedImagePath != null) ...[
-              const SizedBox(height: 16),
-              Image.asset(_pickedImagePath!, height: 150),
-              const Text('Foto Hasil Tersedia')
-            ] else if (_pickedImagePath == null) ...[
-              const SizedBox(height: 16),
-              const Text('Foto hasil pengerjaan belum diambil.')
-            ],
-
-            const Spacer(),
+            const SizedBox(height: 16),
             
-            // 3. Tombol Simpan
+            // Logika Preview Gambar (Menggunakan Image.file)
+            if (_pickedImagePath != null && File(_pickedImagePath!).existsSync()) 
+              Column(
+                children: [
+                  Image.file(
+                    File(_pickedImagePath!), 
+                    height: 200, 
+                    fit: BoxFit.cover,
+                  ),
+                  const SizedBox(height: 8),
+                  const Text('Foto Hasil Tersedia')
+                ],
+              )
+            else if (_pickedImagePath != null) 
+              const Text('Foto tidak ditemukan di path yang tersimpan.')
+            else 
+              const Text('Foto hasil pengerjaan belum diambil.'),
+
+            const SizedBox(height: 40),
+            
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _submitUpdate,
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                child: const Text('SIMPAN & TANDAI SELESAI'),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  backgroundColor: Colors.green
+                ),
+                child: const Text(
+                  'SIMPAN & TANDAI SELESAI',
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
               ),
             ),
           ],

@@ -1,5 +1,3 @@
-// lib/models/report_model.dart
-
 class ReportModel {
   static const String tableName = 'reports';
 
@@ -11,9 +9,8 @@ class ReportModel {
   final double longitude;
   final String status;
   
-  // Field untuk Tugas Mhs 4 (Penyelesaian Laporan) 
-  final String? officerDescription; // Deskripsi pekerjaan yang dilakukan petugas 
-  final String? resultImagePath; // Foto hasil pengerjaan (setelah selesai) 
+  final String? officerDescription; 
+  final String? resultImagePath; 
 
   ReportModel({
     this.id,
@@ -29,7 +26,6 @@ class ReportModel {
 
   // Konstruktor dari Map (Untuk Read dari Database)
   factory ReportModel.fromMap(Map<String, dynamic> map) {
-    // Pengamanan untuk memastikan konversi toDouble() aman
     final latValue = map['latitude'];
     final longValue = map['longitude'];
 
@@ -49,7 +45,6 @@ class ReportModel {
   // Konversi ke Map (Untuk Insert/Update ke Database)
   Map<String, dynamic> toMap() {
     return {
-      // ID tidak diperlukan saat INSERT, tapi penting saat UPDATE
       'id': id, 
       'title': title,
       'description': description,
@@ -75,7 +70,7 @@ class ReportModel {
     String? resultImagePath,
   }) {
     return ReportModel(
-      id: id ?? this.id, // ID dapat dipertahankan atau diubah jika diberikan
+      id: id ?? this.id, 
       title: title ?? this.title,
       description: description ?? this.description,
       imagePath: imagePath ?? this.imagePath,

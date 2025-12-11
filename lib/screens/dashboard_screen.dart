@@ -4,13 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/report_provider.dart';
 import '../models/report_model.dart';
 import 'add_report_screen.dart'; 
-// Import SettingsScreen
 import 'settings_screen.dart'; 
+import 'detail_laporan_screen.dart'; 
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
-  // Fungsi navigasi ke SettingsScreen
   void _navigateToSettings(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (context) => const SettingsScreen()),
@@ -19,6 +18,9 @@ class DashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Memuat data saat dashboard pertama kali dibuat
+    ref.read(reportProvider.notifier).loadReports();
+    
     final reports = ref.watch(reportProvider);
     final totalReports = reports.length;
     final completedReports =
@@ -29,7 +31,6 @@ class DashboardScreen extends ConsumerWidget {
         title: const Text("Dashboard Laporan"),
         centerTitle: true,
         actions: [
-          // TOMBOL NAVIGASI KE SETTINGS
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () => _navigateToSettings(context),
@@ -39,10 +40,8 @@ class DashboardScreen extends ConsumerWidget {
       ),
       body: Column(
         children: [
-          // RINGKASAN LAPORAN
           _buildSummaryCard(totalReports, completedReports, context),
 
-          // LIST LAPORAN
           Expanded(
             child: reports.isEmpty
                 ? const Center(
@@ -67,7 +66,6 @@ class DashboardScreen extends ConsumerWidget {
           ),
         ],
       ),
-      // Tombol Tambah navigasi ke AddReportScreen
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.of(context).push(
@@ -79,7 +77,6 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  // WIDGET CARD RINGKASAN
   Widget _buildSummaryCard(int total, int completed, BuildContext context) {
     return Card(
       margin: const EdgeInsets.all(12),
@@ -134,7 +131,6 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  // WIDGET ITEM LAPORAN (CARD LISTVIEW)
   Widget _buildReportItem(BuildContext context, ReportModel report) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -175,13 +171,16 @@ class DashboardScreen extends ConsumerWidget {
         trailing: _buildStatusBadge(report.status),
 
         onTap: () {
-          // Navigate ke Detail Laporan
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => DetailReportScreen(report: report),
+            ),
+          );
         },
       ),
     );
   }
 
-  // BADGE STATUS
   Widget _buildStatusBadge(String status) {
     final statusLower = status.toLowerCase();
     

@@ -4,10 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import '../models/report_model.dart';
-import '../providers/report_provider.dart';
-
-// Halaman untuk menambah laporan baru
-// Mahasiswa 2 fokus di: Form input + Kamera + GPS + Insert Database
+import '../providers/report_provider.dart'; // PASTI sudah mendefinisikan reportsNotifierProvider di sini!
 
 class AddReportScreen extends ConsumerStatefulWidget {
   const AddReportScreen({super.key});
@@ -17,14 +14,9 @@ class AddReportScreen extends ConsumerStatefulWidget {
 }
 
 class _AddReportScreenState extends ConsumerState<AddReportScreen> {
-  // Controller untuk input form
   final titleCtrl = TextEditingController();
   final descCtrl = TextEditingController();
-
-  // Tempat menyimpan file foto
   File? imageFile;
-
-  // Variabel menyimpan koordinat GPS
   double? lat;
   double? long;
 
@@ -33,16 +25,15 @@ class _AddReportScreenState extends ConsumerState<AddReportScreen> {
   // ----------------------------
   Future<void> pickImage(bool isCamera) async {
     final picker = ImagePicker();
-
-    // Pilih sumber foto: kamera atau galeri
     final XFile? result = await picker.pickImage(
       source: isCamera ? ImageSource.camera : ImageSource.gallery,
     );
 
-    // Jika user mengambil foto
+    if (!mounted) return;
+
     if (result != null) {
       setState(() {
-        imageFile = File(result.path); // Simpan path foto
+        imageFile = File(result.path);
       });
     }
   }
@@ -54,18 +45,27 @@ class _AddReportScreenState extends ConsumerState<AddReportScreen> {
     // Minta izin akses lokasi
     LocationPermission permission = await Geolocator.requestPermission();
 
-    // Jika izin ditolak → tidak bisa ambil lokasi
     if (permission == LocationPermission.denied ||
         permission == LocationPermission.deniedForever) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Izin lokasi ditolak.")),
+      );
       return;
     }
 
-    // Ambil posisi user
+    // Menggunakan LocationSettings untuk mengganti desiredAccuracy yang deprecated
+    final LocationSettings locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 100, 
+    );
+    
     Position pos = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
+        locationSettings: locationSettings,
     );
 
-    // Simpan koordinat ke variabel
+    if (!mounted) return;
+
     setState(() {
       lat = pos.latitude;
       long = pos.longitude;
@@ -80,6 +80,7 @@ class _AddReportScreenState extends ConsumerState<AddReportScreen> {
         imageFile == null ||
         lat == null ||
         long == null) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Lengkapi semua data!")),
       );
@@ -87,6 +88,7 @@ class _AddReportScreenState extends ConsumerState<AddReportScreen> {
     }
 
     // Membuat object laporan
+    // Menggunakan imagePath, dan tidak menggunakan photoPath yang undefined
     final report = ReportModel(
       title: titleCtrl.text,
       description: descCtrl.text,
@@ -95,19 +97,27 @@ class _AddReportScreenState extends ConsumerState<AddReportScreen> {
       longitude: long!,
     );
 
-    // Kirim ke provider untuk disimpan
-    await ref.read(reportProvider.notifier).addReport(report);
+    try {
+      // Menggunakan reportsNotifierProvider.notifier yang benar
+      await ref.read(reportProvider.notifier).addReport(report);
 
-    // Beri notifikasi
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Laporan berhasil disimpan!")),
-    );
+      if (!mounted) return;
 
-    // Kembali ke halaman sebelumnya
-    Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Laporan berhasil disimpan!")),
+      );
+
+      if (!mounted) return;
+      Navigator.pop(context);
+
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Gagal menyimpan laporan: $e")),
+      );
+    }
   }
 
-  // menambah halaman laporan
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -131,7 +141,6 @@ class _AddReportScreenState extends ConsumerState<AddReportScreen> {
             Text("Bukti Foto:", style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
 
-            // Jika belum ada foto → tampil kotak abu-abu
             imageFile == null
                 ? Container(
                     height: 150,
@@ -158,7 +167,6 @@ class _AddReportScreenState extends ConsumerState<AddReportScreen> {
             Text("Lokasi:", style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
 
-            // Jika belum ditandai → tampil teks default
             lat == null
                 ? const Text("Belum ditandai")
                 : Text("Lat: $lat, Long: $long"),

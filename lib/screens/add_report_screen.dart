@@ -4,7 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import '../models/report_model.dart';
-import '../providers/report_provider.dart'; // PASTI sudah mendefinisikan reportsNotifierProvider di sini!
+import '../providers/report_provider.dart'; 
 
 class AddReportScreen extends ConsumerStatefulWidget {
   const AddReportScreen({super.key});
@@ -20,9 +20,7 @@ class _AddReportScreenState extends ConsumerState<AddReportScreen> {
   double? lat;
   double? long;
 
-  // ----------------------------
   // FUNGSI AMBIL FOTO
-  // ----------------------------
   Future<void> pickImage(bool isCamera) async {
     final picker = ImagePicker();
     final XFile? result = await picker.pickImage(

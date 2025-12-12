@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/auth_provider.dart';
 
-// Widget RegisterScreen: Layar untuk pendaftaran pengguna baru.
+//layar untuk pendaftaran pengguna baru
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
@@ -13,20 +13,21 @@ class RegisterScreen extends ConsumerStatefulWidget {
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  String? _errorMessage;
+  String? _errorMessage; //variable lokal yang menyimpan pesan eror
 
-  // Handler Register: Memanggil fungsi register dari AuthNotifier.
+  //Memanggil fungsi register dari AuthNotifier.
   Future<void> _handleRegister() async {
     setState(() {
       _errorMessage = null;
     });
-    
+    //pengambilan data
     final username = _usernameController.text;
     final password = _passwordController.text;
 
     try {
+      //mendelegasikan tugas ke authnotifier
       await ref.read(authProvider.notifier).register(username, password);
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Registrasi Berhasil! Silakan Login.')),
       );
@@ -54,7 +55,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)
             ),
             const SizedBox(height: 30),
-            TextField(
+            TextField( //input yang terhubung ke texteditingcontroller
               controller: _usernameController,
               decoration: const InputDecoration(
                 labelText: 'Username',
@@ -68,13 +69,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 labelText: 'Password',
                 border: OutlineInputBorder(),
               ),
-              obscureText: true,
+              obscureText: true, //untuk keamanan
             ),
             const SizedBox(height: 20),
             if (_errorMessage != null)
               Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
             const SizedBox(height: 10),
-            ElevatedButton(
+            ElevatedButton( //tombol yang menghubungkan onpressed ke fungsi handregister
               onPressed: _handleRegister,
               child: const Text('Register'),
             ),

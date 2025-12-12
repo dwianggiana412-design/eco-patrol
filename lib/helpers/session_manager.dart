@@ -10,7 +10,6 @@ class SessionManager {
   // Key untuk contoh pengaturan (misal, tema gelap)
   static const String _keyDarkMode = 'isDarkMode';
 
-  // --- INISIALISASI ---
   // Harus dipanggil di main() sebelum runApp
   static Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();

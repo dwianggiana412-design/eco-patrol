@@ -1,10 +1,12 @@
 class ReportModel {
   static const String tableName = 'reports';
 
-  final int? id;
+  final int? id; //kuci utama
+  //detail laporan pengguna
   final String title;
   final String description;
   final String imagePath;
+  //lokasi kejadian
   final double latitude;
   final double longitude;
   final String status;
@@ -24,7 +26,7 @@ class ReportModel {
     this.resultImagePath,
   });
 
-  // Konstruktor dari Map (Untuk Read dari Database)
+ //mengambil data dari format map
   factory ReportModel.fromMap(Map<String, dynamic> map) {
     final latValue = map['latitude'];
     final longValue = map['longitude'];
@@ -42,7 +44,7 @@ class ReportModel {
     );
   }
 
-  // Konversi ke Map (Untuk Insert/Update ke Database)
+  //untuk mengubah objek reportmodel
   Map<String, dynamic> toMap() {
     return {
       'id': id, 
@@ -57,7 +59,7 @@ class ReportModel {
     };
   }
 
-  // Metode copyWith untuk mempermudah mengupdate data
+  //untuk mempermudah mengupdate data
   ReportModel copyWith({
     int? id,
     String? status,

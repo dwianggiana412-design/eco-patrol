@@ -3,15 +3,15 @@ import '../helpers/session_manager.dart';
 
 class AuthNotifier extends StateNotifier<bool> {
   AuthNotifier() : super(false) {
-    _checkInitialStatus();
+    _checkInitialStatus(); //memanggil metode asinkron setelah autnotivier dibuat
   }
 
   Future<void> _checkInitialStatus() async {
-    state = SessionManager.isLoggedIn;
+    state = SessionManager.isLoggedIn; //mengambil status login dan mengatur sebagai state
   }
 
   Future<void> register(String username, String password) async {
-    if (username.length < 3) {
+    if (username.length < 3) { //apakah username kurang dari 3 karakter
       throw Exception('Username minimal 3 karakter');
     }
     if (password.length < 6) {
@@ -19,7 +19,8 @@ class AuthNotifier extends StateNotifier<bool> {
     }
   }
 
-  Future<void> login(String username, String password) async {
+  Future<void> login(String username, String password) async { //login
+  //memeriksa apakah kredensial cocok dg nilai hardcoded
     if (username == 'user' && password == '123') {
       await SessionManager.setLoggedIn(true);
       state = true; 
@@ -29,11 +30,12 @@ class AuthNotifier extends StateNotifier<bool> {
   }
 
   Future<void> logout() async {
-    await SessionManager.setLoggedIn(false);
+    await SessionManager.setLoggedIn(false); //membersihkan status login di penyimpanan
     state = false;
   }
 }
 
-final authProvider = StateNotifierProvider<AuthNotifier, bool>((ref) {
-  return AuthNotifier();
+//authprovider
+final authProvider = StateNotifierProvider<AuthNotifier, bool>((ref) { //menghubungkan statenotifier dengan state yang dikelola (bool)
+  return AuthNotifier(); //instruksi ke riverpood untuk mengembalikan instance baru dari authnotifier
 });

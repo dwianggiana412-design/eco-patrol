@@ -7,26 +7,29 @@ import 'screens/login_screen.dart';
 import 'screens/dashboard_screen.dart'; 
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized(); //memastikan kesiapan flutter
   await SessionManager.init();
-  final dbHelper = DBHelper();
+  final dbHelper = DBHelper(); //memanggil get database
   await dbHelper.database;
+  //meluncurkan widget akar aplikasi
   runApp(
     const ProviderScope(child: EcoPatrolApp()),
   );
 }
 
+//widget utama yang menggunakan cunsomerwidget
 class EcoPatrolApp extends ConsumerWidget {
   const EcoPatrolApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isLoggedIn = ref.watch(authProvider);
+    final isLoggedIn = ref.watch(authProvider); //aksi kunci menggunakan ref.watch pada authprovider
 
     return MaterialApp(
       title: 'EcoPatrol App',
       theme: ThemeData(primarySwatch: Colors.green),
-      home: isLoggedIn
+      //penentu navigasi awal
+        home: isLoggedIn
           ? const DashboardScreen()
           : const LoginScreen(),
     );

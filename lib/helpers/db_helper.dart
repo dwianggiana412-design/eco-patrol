@@ -6,8 +6,7 @@ import '../models/report_model.dart';
 class DBHelper {
   static Database? _database;
   static const String _databaseName = 'ecopatrol.db';
-  // KRITIS: NAIKKAN VERSI DATABASE JADI 2
-  static const int _databaseVersion = 2; 
+  static const int _databaseVersion = 2; //versi database sekarang
 
   Future<Database> get database async {
     if (_database != null) return _database!;
@@ -15,16 +14,17 @@ class DBHelper {
     return _database!;
   }
 
-  Future<Database> _initDatabase() async {
+  Future<Database> _initDatabase() async { //menentukan jalur dan memanggil fungsi callback
     String path = join(await getDatabasesPath(), _databaseName);
     return await openDatabase(
       path,
       version: _databaseVersion,
       onCreate: _onCreate,
-      onUpgrade: _onUpgrade, // Tambahkan fungsi onUpgrade di sini
+      onUpgrade: _onUpgrade, 
     );
   }
 
+//dipanggil jika database blm prnh ada
   Future _onCreate(Database db, int version) async {
     await db.execute('''
       CREATE TABLE ${ReportModel.tableName} (
@@ -42,10 +42,11 @@ class DBHelper {
     print("SQFlite: Tabel '${ReportModel.tableName}' berhasil dibuat dengan skema lengkap (V$version).");
   }
 
-  // FUNGSI 2: _onUpgrade (Dijalankan saat database lama ditemukan dan versinya lebih rendah)
+  //Dijalankan saat database lama ditemukan dan versinya lebih rendah
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
     print("SQFlite: Melakukan upgrade dari V$oldVersion ke V$newVersion...");
     
+    //dipanggil ktika pengguna menginstal versi baru
     if (oldVersion < 2) {
       await db.execute(
         'ALTER TABLE ${ReportModel.tableName} ADD COLUMN officerDescription TEXT',
@@ -57,7 +58,7 @@ class DBHelper {
     }
   }
 
-  // Insert report
+  // menyimpan laporan baru dari pengguna ke database
   Future<int> insertReport(ReportModel report) async {
     final db = await database;
     return await db.insert(
@@ -67,7 +68,7 @@ class DBHelper {
     );
   }
 
-  // Get all reports
+  // mengambil laporan yag tersimpann
   Future<List<ReportModel>> getReports() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(ReportModel.tableName);
@@ -76,7 +77,7 @@ class DBHelper {
     });
   }
 
-  // Update report
+  // memperbarui detail laporan yag sudah ada
   Future<int> updateReport(ReportModel report) async {
     final db = await database;
     return await db.update(
@@ -87,7 +88,7 @@ class DBHelper {
     );
   }
 
-  // Delete report by id
+  // menghapus laporan berdasarkan id
   Future<int> deleteReport(int id) async {
     final db = await database;
     return await db.delete(
@@ -98,4 +99,4 @@ class DBHelper {
   }
 }
 
-final dbHelperProvider = Provider((ref) => DBHelper());
+final dbHelperProvider = Provider((ref) => DBHelper()); //mendefinisikan sebagai provider

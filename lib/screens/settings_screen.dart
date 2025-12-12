@@ -6,8 +6,8 @@ class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    
+  Widget build(BuildContext context, WidgetRef ref) { //metode build yang menerima widgetref ref sebagai argumen
+    //menempatka opsi logout menggunakan widget listtile
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
       body: ListView(
@@ -16,7 +16,7 @@ class SettingsScreen extends ConsumerWidget {
             leading: const Icon(Icons.logout),
             title: const Text('Logout'),
             onTap: () async {
-              await ref.read(authProvider.notifier).logout();
+              await ref.read(authProvider.notifier).logout(); //mendelegasikan logout ke authnotifier
             },
           ),
         ],
